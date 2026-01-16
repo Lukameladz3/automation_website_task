@@ -19,64 +19,33 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.57.0-noble
+      # Using the official Playwright container
+      image: mcr.microsoft.com/playwright:v1.49.0-noble
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 10.23.0
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 20
-
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
+        # This built-in cache handles your node_modules automatically
+        cache: 'npm'
 
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      run: npm ci
 
     - name: Run Playwright tests
-      run: pnpm exec playwright test
+      run: npx playwright test
       env:
         HOME: /root
 
-    - name: Upload test results (videos, traces, screenshots)
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: playwright-report/
-        retention-days: 30
-
-    - name: Upload HTML report
+    - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
         path: playwright-report/
-        retention-days: 30
-
-    - name: Upload Test Reports
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-all-reports
-        path: test-reports/
         retention-days: 30
 
   deploy:
@@ -89,28 +58,23 @@ jobs:
     steps:
     - name: Download test results
       uses: actions/download-artifact@v4
-      if: always()
       with:
         name: playwright-report
         path: playwright-report/
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
-      if: always()
 
     - name: Prepare report for GitHub Pages
-      if: always()
       run: |
         mkdir -p github-pages-site
         cp -r playwright-report/* github-pages-site/
 
     - name: Upload to GitHub Pages
       uses: actions/upload-pages-artifact@v3
-      if: always()
       with:
         path: github-pages-site/
 
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      if: always()
