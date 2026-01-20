@@ -42,14 +42,14 @@ pipeline {
             archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
             
             // Requires "HTML Publisher" plugin
-            // publishHTML(target: [
-            //     allowMissing: false,
-            //     alwaysLinkToLastBuild: true,
-            //     keepAll: true,
-            //     reportDir: 'playwright-report',
-            //     reportFiles: 'index.html',
-            //     reportName: 'Playwright HTML Report'
-            // ])
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright HTML Report'
+            ])
         }
         failure {
             echo 'Pipeline failed. Please check the logs and artifacts.'
