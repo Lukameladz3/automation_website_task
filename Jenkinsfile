@@ -6,11 +6,6 @@ pipeline {
         timestamps()
     }
 
-    environment {
-        // Ensure pnpm is available in the path if installed via npm
-        PATH = "${HOME}/.local/bin:${env.PATH}"
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -21,22 +16,22 @@ pipeline {
         stage('Setup') {
             steps {
                 echo 'Setting up environment...'
-                sh 'npm install'
-                sh 'npx playwright install --with-deps'
+                bat 'npm install'
+                bat 'npx playwright install'
             }
         }
 
         stage('Lint') {
             steps {
                 echo 'Running lint...'
-                sh 'npm run lint'
+                bat 'npm run lint'
             }
         }
 
         stage('Run Playwright Tests') {
             steps {
                 echo 'Running tests...'
-                sh 'npx playwright test'
+                bat 'npx playwright test'
             }
         }
     }
