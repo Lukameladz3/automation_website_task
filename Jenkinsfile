@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/playwright:v1.57.0-noble'
-        }
-    }
+    agent any
 
     options {
         timeout(time: 60, unit: 'MINUTES')
@@ -26,6 +22,7 @@ pipeline {
             steps {
                 echo 'Setting up environment...'
                 sh 'npm install'
+                sh 'npx playwright install --with-deps'
             }
         }
 
